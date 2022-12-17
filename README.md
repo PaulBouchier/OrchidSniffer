@@ -1,6 +1,6 @@
 # Orchid Sniffer
 
-This sketch sniffs data from the AIS server aboard the sailboat "Wild Orchid" and
+This sketch sniffs data from the AIS server aboard a sailboat and
 displays it on an M5StickC Plus.
 
 The file secrets.template.h must be copied to secrets.h and your Wifi 

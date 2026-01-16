@@ -33,6 +33,8 @@ float TWD = 0.0;
 float TWS = 0.0;
 float COG = 0.0;
 float SOG = 0.0;
+float Cabin = 0.0; // New: Cabin temperature
+float Cockpit = 0.0; // New: Cockpit temperature
 
 // display modes
 enum DisplayMode {
@@ -40,6 +42,7 @@ enum DisplayMode {
     DISPLAY_WIND_DIR,
     DISPLAY_BOAT_SPEED, // SOG
     DISPLAY_BOAT_HEADING, // COG
+    DISPLAY_COCKPIT_TEMP, // New: Cockpit temperature
     DISPLAY_TIME,
     DISPLAY_MODE_LAST
 };
@@ -73,59 +76,77 @@ void setupWifi() {
 }
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
+    // This function is called when an MQTT message is received.
+    // It parses the incoming message to extract navigation data.
     Serial.print("Message arrived [");
     Serial.print(topic);
     Serial.print("] ");
     char message[length + 1];
     strncpy(message, (char*)payload, length);
-    message[length] = '\0'; // Null-terminate the string
+    message[length] = '\0'; // Null-terminate the string received from MQTT.
 
     Serial.println(message);
 
-    // Check for MQ_reset
+    // Check if the message is a reset command.
     if (strcmp(message, "MQ_reset") == 0) {
         Serial.println("MQ_reset received");
-        // For Arduino, a system reset might involve ESP.restart() or similar,
-        // but for now, we'll just acknowledge.
+        // In a real application, this might trigger a system reset (e.g., ESP.restart()).
+        // For now, it just acknowledges the reset command.
     } else {
-        // Parse comma-separated data
+        // Parse comma-separated data from the MQTT message.
+        // The data format is: udoo_time, TWD, TWS, COG, SOG, Cabin, Cockpit
+        // strtok_r is used for safe re-entrant tokenization of the string.
         char* token;
         char* rest = message;
 
-        // udoo_time
+        // Extract udoo_time (HH:MM:SS string).
         token = strtok_r(rest, ",", &rest);
         if (token != NULL) {
             strncpy(udoo_time, token, sizeof(udoo_time) - 1);
-            udoo_time[sizeof(udoo_time) - 1] = '\0';
+            udoo_time[sizeof(udoo_time) - 1] = '\0'; // Ensure null-termination.
         }
 
-        // TWD
+        // Extract TWD (True Wind Direction) as a float.
         token = strtok_r(rest, ",", &rest);
         if (token != NULL) {
-            TWD = atof(token);
+            TWD = atof(token); // Convert string to float.
         }
 
-        // TWS
+        // Extract TWS (True Wind Speed) as a float.
         token = strtok_r(rest, ",", &rest);
         if (token != NULL) {
-            TWS = atof(token);
+            TWS = atof(token); // Convert string to float.
         }
 
-        // COG
+        // Extract COG (Course Over Ground) as a float.
         token = strtok_r(rest, ",", &rest);
         if (token != NULL) {
-            COG = atof(token);
+            COG = atof(token); // Convert string to float.
         }
 
-        // SOG
+        // Extract SOG (Speed Over Ground) as a float.
         token = strtok_r(rest, ",", &rest);
         if (token != NULL) {
-            SOG = atof(token);
+            SOG = atof(token); // Convert string to float.
         }
-        // Ignoring Cabin and Cockpit as per instructions
+        // Ignoring Cabin and Cockpit fields as per project instructions.
+        // Re-enabling parsing for Cabin and Cockpit as per new requirements.
 
-        Serial.printf("Parsed Data: Time=%s, TWD=%.1f, TWS=%.1f, COG=%.1f, SOG=%.1f\n",
-                      udoo_time, TWD, TWS, COG, SOG);
+        // Extract Cabin temperature as a float.
+        token = strtok_r(rest, ",", &rest);
+        if (token != NULL) {
+            Cabin = atof(token); // Convert string to float.
+        }
+
+        // Extract Cockpit temperature as a float.
+        token = strtok_r(rest, ",", &rest);
+        if (token != NULL) {
+            Cockpit = atof(token); // Convert string to float.
+        }
+
+        // Print the parsed data to the Serial monitor for debugging.
+        Serial.printf("Parsed Data: Time=%s, TWD=%.1f, TWS=%.1f, COG=%.1f, SOG=%.1f, Cabin=%.1f, Cockpit=%.1f\n",
+                      udoo_time, TWD, TWS, COG, SOG, Cabin, Cockpit);
     }
 }
 
@@ -240,12 +261,20 @@ void loop() {
             M5.Lcd.setCursor(180, 40, 4);
             M5.Lcd.print("deg");
         }
+        else if (displayMode == DISPLAY_COCKPIT_TEMP) // New display for Cockpit Temperature
+        {
+            M5.Lcd.setCursor(0, 0, 4);
+            M5.Lcd.print("Cockpit Temp");
+    
+            M5.Lcd.setCursor(0, 40, 8);
+            M5.Lcd.printf("%.1f C\n", Cockpit);
+        }
         else if (displayMode == DISPLAY_TIME)
         {
             M5.Lcd.setCursor(0, 0, 4);
             M5.Lcd.print("Time");
     
-            M5.Lcd.setCursor(00, 40, 8);
+            M5.Lcd.setCursor(00, 40, 6);
             M5.Lcd.printf("%s", udoo_time);
         }    // Removed DISPLAY_POWER as AIS is no longer used
 

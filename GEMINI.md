@@ -31,6 +31,8 @@ containing the following comma-separated fields formatted as text strings:
 - TWS
 - COG
 - SOG
+- Cabin_temp
+- Cockpit_temp
 
 There may be additional fields.
 
@@ -57,7 +59,7 @@ methods it uses, including the ai***Handler functions and the parser initializat
 ```gemini
     - Change the topic name that the mqttConnect method subscribes to to "Time"
     - Change the mqttCallback() function to implement the parsing function specified by
-the python MQTT callback code below. You can ignore and discard the Cabin and Cockpit fields.
+the python MQTT callback code below.
 ```
 ```gemini
 def sub_cb(topic, msg):
@@ -79,7 +81,7 @@ IMPORTANT: Data received from the MQTT topic is a C-style string (null-terminate
 
 3. Print received data to Serial
 
-    - Print the fields udoo_time, TWD, TWS, COG, SOG to the Serial port
+    - Print the fields udoo_time, TWD, TWS, COG, SOG, Cabin_temp, Cockpit_temp to the Serial port
 
 4. Modify the display output in the loop() function. The
 variables represent:
@@ -87,10 +89,11 @@ variables represent:
 - TWS: wind speed
 - COG: boat heading
 - SOG: boat speed
+- cockpit_temp: temperature in degrees F in cockpit
 - udoo_time: boat time
 
 Order of display
 - The first (default) variable to display should be wind speed
-- The order of display should be: TWS, TWD, SOG, COG, time
-
+- The order of display should be: TWS, TWD, SOG, COG, Cockpit_temp, time
+- If time is to be displayed, use setCursor(00, 40, 4) to use half-size text
 

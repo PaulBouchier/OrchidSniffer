@@ -220,7 +220,7 @@ void loop() {
         if (displayMode == DISPLAY_WIND_SPEED)
         {
             M5.Lcd.setCursor(0, 0, 4);
-            M5.Lcd.print("Wind speed");
+            M5.Lcd.print("TWS");
     
             M5.Lcd.setCursor(0, 40, 8);
             M5.Lcd.printf("%0.1f", TWS);
@@ -231,7 +231,7 @@ void loop() {
         else if (displayMode == DISPLAY_WIND_DIR)
         {
             M5.Lcd.setCursor(0, 0, 4);
-            M5.Lcd.print("Wind direction");
+            M5.Lcd.print("TWD");
     
             M5.Lcd.setCursor(0, 40, 8);
             M5.Lcd.printf("%.0f deg\n", TWD);
@@ -242,7 +242,7 @@ void loop() {
         else if (displayMode == DISPLAY_BOAT_SPEED)
         {
             M5.Lcd.setCursor(0, 0, 4);
-            M5.Lcd.print("Boat Speed");
+            M5.Lcd.print("SOG");
     
             M5.Lcd.setCursor(0, 40, 8);
             M5.Lcd.printf("%0.1f", SOG);
@@ -253,7 +253,7 @@ void loop() {
         else if (displayMode == DISPLAY_BOAT_HEADING)
         {
             M5.Lcd.setCursor(0, 0, 4);
-            M5.Lcd.print("Boat Heading");
+            M5.Lcd.print("COG");
     
             M5.Lcd.setCursor(0, 40, 8);
             M5.Lcd.printf("%.0f deg\n", COG);
